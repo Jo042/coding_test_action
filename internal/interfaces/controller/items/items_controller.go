@@ -117,6 +117,51 @@ func (h *ItemHandler) DeleteItem(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+func (h *ItemHandler) UpdateItem(c echo.Context) error {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id <= 0 {
+		return c.JSON(http.StatusBadRequest, ErrorResponse{
+			Error: "invalid item ID",
+		})
+	}
+
+	var input usecase.UpdateItemInput
+	if err := c.Bind(&input); err != nil {
+		return c.JSON(http.StatusBadRequest, ErrorResponse{
+			Error: "invalid request format",
+		})
+	}
+
+	// 1つも更新項目が送られてこなかったら 400 にする
+	if input.Name == nil && input.Brand == nil && input.PurchasePrice == nil {
+		return c.JSON(http.StatusBadRequest, ErrorResponse{
+			Error:   "validation failed",
+			Details: []string{"at least one of name, brand, or purchase_price must be provided"},
+		})
+	}
+
+	item, err := h.itemUsecase.UpdateItem(c.Request().Context(), id, input)
+	if err != nil {
+		if domainErrors.IsNotFoundError(err) {
+			return c.JSON(http.StatusNotFound, ErrorResponse{
+				Error: "item not found",
+			})
+		}
+		if domainErrors.IsValidationError(err) {
+			return c.JSON(http.StatusBadRequest, ErrorResponse{
+				Error:   "validation failed",
+				Details: []string{err.Error()},
+			})
+		}
+		return c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error: "failed to update item",
+		})
+	}
+
+	return c.JSON(http.StatusOK, item)
+}
+
 func (h *ItemHandler) GetSummary(c echo.Context) error {
 	summary, err := h.itemUsecase.GetCategorySummary(c.Request().Context())
 	if err != nil {
