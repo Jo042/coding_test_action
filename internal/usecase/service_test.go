@@ -447,3 +447,7 @@ func TestItemUsecase_GetCategorySummary(t *testing.T) {
 		})
 	}
 }
+
+func (m *MockItemRepository) Update(ctx context.Context, item *entity.Item) error {
+    return nil
+}
