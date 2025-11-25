@@ -1,0 +1,52 @@
+# --- Go ビルド成果物 ---
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# go build / go test などでできるディレクトリ
+/bin/
+/build/
+/dist/
+/tmp/
+/coverage/
+/cache/
+/*.coverprofile
+
+# vendor（この課題では基本使わない想定）
+vendor/
+
+# --- 環境変数ファイル（本番用 /.local 用） ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# .env.* 
+.env.*
+!.env.example
+
+# --- ログ・一時ファイル ---
+*.log
+*.tmp
+
+# --- Docker / DB のローカルデータ ---
+mysql-data/
+db-data/
+data/
+volumes/
+
+# --- エディタ／IDE 設定 ---
+.vscode/
+.idea/
+*.swp
+*~
+*.iml
+
+# --- OS 依存ファイル ---
+.DS_Store
+Thumbs.db
